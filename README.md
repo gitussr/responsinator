@@ -1,1 +1,1 @@
-# responsinator(https://gitussr.github.io/responsinator/)
+# [responsinator](https://gitussr.github.io/responsinator/)
