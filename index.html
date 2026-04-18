@@ -4,1348 +4,840 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Responsinator — Responsive Design Tester</title>
+<title>Responsinator — Responsive Tester</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0b0d;
-    --surface: #111318;
-    --surface2: #181c23;
-    --surface3: #1e2330;
-    --border: #252c3a;
-    --border2: #2d3547;
-    --accent: #00e5ff;
-    --accent2: #7c4dff;
-    --accent3: #00e676;
-    --text: #e8eaf0;
-    --text2: #8892a4;
-    --text3: #4a5568;
-    --danger: #ff4757;
-    --warn: #ffa502;
-    --radius: 8px;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'Syne', sans-serif;
-  }
+:root {
+  --bg:#090b0e; --sf:#0f1117; --sf2:#161920; --sf3:#1c2028;
+  --bd:#21262f; --bd2:#2a3141;
+  --ac:#00e5ff; --ac2:#7c4dff; --ac3:#00e676; --wn:#ffaa00;
+  --tx:#dde2ec; --tx2:#7a8799; --tx3:#404c5e;
+  --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--mono);overflow:hidden}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* APP */
+.app{display:grid;grid-template-rows:54px 50px 1fr;grid-template-columns:272px 1fr;height:100vh}
 
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    overflow: hidden;
-  }
+/* TOPBAR */
+.topbar{
+  grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:0 16px;
+  background:var(--sf);border-bottom:1px solid var(--bd);z-index:20
+}
+.logo{
+  font-family:var(--sans);font-weight:800;font-size:17px;letter-spacing:-.5px;
+  color:var(--tx);display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0
+}
+.logo-m{
+  width:30px;height:30px;border-radius:7px;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  display:flex;align-items:center;justify-content:center
+}
+.logo em{color:var(--ac);font-style:normal}
+.urlbar{
+  flex:1;display:flex;align-items:center;gap:8px;
+  background:var(--sf2);border:1px solid var(--bd);border-radius:6px;
+  padding:0 12px;height:34px;transition:border-color .15s;min-width:0
+}
+.urlbar:focus-within{border-color:var(--ac)}
+.urlbar input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--tx);font-family:var(--mono);font-size:12px;min-width:0
+}
+.urlbar input::placeholder{color:var(--tx3)}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:32px;
+  border-radius:6px;border:none;font-family:var(--mono);font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0
+}
+.btn-p{background:var(--ac);color:#000}
+.btn-p:hover{background:#33eeff;transform:translateY(-1px)}
+.btn-g{background:var(--sf3);color:var(--tx2);border:1px solid var(--bd)}
+.btn-g:hover{border-color:var(--ac);color:var(--ac)}
 
-  /* ─── LAYOUT ─── */
-  .app {
-    display: grid;
-    grid-template-rows: 56px 52px 1fr;
-    grid-template-columns: 280px 1fr;
-    height: 100vh;
-  }
+/* TOOLBAR */
+.toolbar{
+  grid-column:1/-1;display:flex;align-items:center;
+  background:var(--sf2);border-bottom:1px solid var(--bd);
+  padding:0 12px;overflow-x:auto;scrollbar-width:none
+}
+.toolbar::-webkit-scrollbar{display:none}
+.tsep{width:1px;height:26px;background:var(--bd);margin:0 6px;flex-shrink:0}
+.tlbl{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--tx3);text-transform:uppercase;padding:0 5px;white-space:nowrap;flex-shrink:0}
+.tbtn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:5px 9px;border-radius:5px;border:none;background:none;cursor:pointer;
+  transition:all .15s;flex-shrink:0;min-width:50px
+}
+.tbtn:hover{background:var(--sf3)}
+.tbtn.active{background:rgba(0,229,255,.08)}
+.tbtn.active .ti{color:var(--ac)}
+.tbtn.active .tn{color:var(--ac)}
+.ti{color:var(--tx3);transition:color .15s}
+.tn{font-size:9px;color:var(--tx3);white-space:nowrap;transition:color .15s}
+.rot-btn{
+  display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:5px;
+  border:1px solid var(--bd);background:none;color:var(--tx2);
+  font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;flex-shrink:0
+}
+.rot-btn:hover{border-color:var(--ac);color:var(--ac)}
 
-  /* ─── TOP BAR ─── */
-  .topbar {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 0 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    z-index: 10;
-  }
+/* SIDEBAR */
+.sidebar{
+  background:var(--sf);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+  grid-row:3;grid-column:1
+}
+.stabs{display:flex;border-bottom:1px solid var(--bd)}
+.stab{
+  flex:1;padding:9px 6px;border:none;background:none;font-family:var(--mono);
+  font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--tx3);
+  cursor:pointer;text-transform:uppercase;transition:all .15s;
+  border-bottom:2px solid transparent
+}
+.stab.active{color:var(--ac);border-bottom-color:var(--ac)}
+.sbody{flex:1;overflow-y:auto;padding:10px;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+.sbody::-webkit-scrollbar{width:3px}
+.sbody::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 
-  .logo {
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.5px;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .logo-icon {
-    width: 28px; height: 28px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-  }
-  .logo span { color: var(--accent); }
+.dg{margin-bottom:14px}
+.dgt{
+  font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--tx3);
+  text-transform:uppercase;margin-bottom:5px;padding:0 2px;
+  display:flex;align-items:center;gap:6px
+}
+.dgt::after{content:'';flex:1;height:1px;background:var(--bd)}
+.di{
+  display:flex;align-items:center;gap:9px;padding:6px 9px;
+  border-radius:6px;border:1px solid transparent;cursor:pointer;transition:all .15s
+}
+.di:hover{background:var(--sf2);border-color:var(--bd)}
+.di.active{background:rgba(0,229,255,.05);border-color:rgba(0,229,255,.2)}
+.dic{width:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--tx3)}
+.di.active .dic{color:var(--ac)}
+.din{font-size:11px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.di.active .din{color:var(--ac)}
+.did{font-size:9px;color:var(--tx3);margin-top:1px}
+.bge{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:.5px;flex-shrink:0}
+.bnew{background:rgba(0,230,118,.1);color:var(--ac3)}
+.bold{background:rgba(255,170,0,.1);color:var(--wn)}
 
-  .url-bar {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0 12px;
-    height: 36px;
-    transition: border-color .2s;
-  }
-  .url-bar:focus-within { border-color: var(--accent); }
-  .url-bar svg { color: var(--text3); flex-shrink: 0; }
-  .url-bar input {
-    flex: 1; background: none; border: none; outline: none;
-    color: var(--text); font-family: var(--mono); font-size: 12px;
-  }
-  .url-bar input::placeholder { color: var(--text3); }
+/* custom panel */
+.cpnl{padding:10px;background:var(--sf2);border-radius:7px;border:1px solid var(--bd);margin-bottom:12px}
+.cptl{font-size:8px;font-weight:700;letter-spacing:1px;color:var(--tx3);text-transform:uppercase;margin-bottom:8px}
+.crow{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.cin{
+  flex:1;background:var(--sf);border:1px solid var(--bd);border-radius:4px;
+  padding:5px 8px;font-family:var(--mono);font-size:11px;color:var(--tx);
+  outline:none;transition:border-color .15s
+}
+.cin:focus{border-color:var(--ac)}
+.rtag{display:inline-flex;align-items:center;font-size:8px;padding:2px 5px;border-radius:3px;font-weight:700;letter-spacing:.5px;flex-shrink:0}
+.rtm{background:rgba(0,229,255,.1);color:var(--ac)}
+.rtt{background:rgba(124,77,255,.1);color:var(--ac2)}
+.rtd{background:rgba(0,230,118,.1);color:var(--ac3)}
 
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 6px; border: none;
-    font-family: var(--mono); font-size: 12px; font-weight: 500;
-    cursor: pointer; transition: all .15s; white-space: nowrap;
-  }
-  .btn-primary {
-    background: var(--accent); color: #000;
-  }
-  .btn-primary:hover { background: #00cfea; transform: translateY(-1px); }
-  .btn-ghost {
-    background: var(--surface3); color: var(--text2); border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+/* info cards */
+.icd{padding:10px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;margin-bottom:8px}
+.icd-t{font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--tx3);text-transform:uppercase;margin-bottom:5px}
+.icd p{font-size:10px;color:var(--tx2);line-height:1.7}
+.icd.wn{border-color:rgba(255,170,0,.2);background:rgba(255,170,0,.04)}
+.icd.wn .icd-t{color:var(--wn)}
+.icd.ok{border-color:rgba(0,230,118,.2);background:rgba(0,230,118,.04)}
+.icd.ok .icd-t{color:var(--ac3)}
 
-  .topbar-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+/* CANVAS */
+.canvas{
+  grid-row:3;grid-column:2;
+  background:var(--bg);overflow:auto;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:36px 40px 60px;
+  scrollbar-width:thin;scrollbar-color:var(--bd) transparent;
+  position:relative
+}
+.canvas::-webkit-scrollbar{width:6px;height:6px}
+.canvas::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
 
-  /* ─── DEVICE TOOLBAR ─── */
-  .device-toolbar {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    gap: 0;
-    padding: 0 16px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .device-toolbar::-webkit-scrollbar { display: none; }
+/* Size holder: actual space on page after scaling */
+.sh{position:relative;flex-shrink:0}
+/* Frame root: absolutely positioned inside holder, scales from top-center */
+.fr{
+  position:absolute;top:0;left:50%;
+  transform-origin:top center;
+  display:flex;flex-direction:column;align-items:center;gap:14px
+}
 
-  .toolbar-section {
-    display: flex; align-items: center; gap: 2px;
-    padding: 0 8px; border-right: 1px solid var(--border);
-  }
-  .toolbar-section:first-child { padding-left: 0; }
-  .toolbar-section:last-child { border-right: none; }
+/* META */
+.dmeta{text-align:center}
+.dmeta-n{font-family:var(--sans);font-weight:700;font-size:15px;color:var(--tx);letter-spacing:-.3px}
+.dmeta-d{font-size:10px;color:var(--tx2);margin-top:3px;display:flex;align-items:center;justify-content:center;gap:6px}
 
-  .toolbar-label {
-    font-size: 9px; font-weight: 600; letter-spacing: 1px;
-    color: var(--text3); text-transform: uppercase;
-    padding: 0 6px; white-space: nowrap;
-  }
+/* PHONE SHELL */
+.pshell{
+  background:linear-gradient(145deg,#1e2035,#141620 60%,#1a1b2e);
+  border-radius:38px;position:relative;display:inline-block;
+  box-shadow:0 0 0 1.5px #2c2f4a,0 0 0 3px #090b0e,0 0 0 4.5px #252840,0 32px 80px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)
+}
+.pshell::before{/* pill notch */
+  content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  width:76px;height:9px;background:#090b0e;border-radius:6px;z-index:2
+}
+.pshell::after{/* volume button */
+  content:'';position:absolute;left:-4px;top:96px;width:4px;height:32px;
+  background:#1e2035;border-radius:2px 0 0 2px;
+  box-shadow:0 44px 0 #1e2035
+}
+.pscr{border-radius:26px;overflow:hidden;background:#111;margin:18px 8px 8px}
+.pbar{height:18px;display:flex;align-items:center;justify-content:center;margin:2px 0 6px}
+.pbar-i{width:100px;height:4px;background:#2c2f4a;border-radius:3px}
 
-  .device-btn {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; padding: 4px 8px; border-radius: 4px; border: none;
-    background: none; cursor: pointer; transition: all .15s;
-    min-width: 56px;
-  }
-  .device-btn:hover { background: var(--surface3); }
-  .device-btn.active { background: rgba(0,229,255,.08); }
-  .device-btn.active .d-icon { color: var(--accent); }
-  .device-btn.active .d-name { color: var(--accent); }
-  .d-icon { font-size: 14px; color: var(--text2); transition: color .15s; }
-  .d-name {
-    font-size: 9px; color: var(--text3); white-space: nowrap;
-    font-family: var(--mono); transition: color .15s;
-  }
+/* TABLET SHELL */
+.tshell{
+  background:linear-gradient(145deg,#1e2035,#141620 60%,#1a1b2e);
+  border-radius:20px;position:relative;display:inline-block;
+  box-shadow:0 0 0 1.5px #2c2f4a,0 0 0 3px #090b0e,0 0 0 4.5px #252840,0 32px 80px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06)
+}
+.tshell::before{/* home button left */
+  content:'';position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  width:5px;height:48px;background:#0f1020;border-radius:3px
+}
+.tscr{border-radius:8px;overflow:hidden;background:#111;margin:18px 14px}
 
-  /* ─── SIDEBAR ─── */
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    overflow: hidden;
-  }
+/* LAPTOP */
+.lw{display:flex;flex-direction:column;align-items:center}
+.llid{
+  background:linear-gradient(160deg,#1e2035,#141620);
+  border-radius:12px 12px 4px 4px;display:inline-block;
+  box-shadow:0 0 0 1.5px #2c2f4a,0 0 0 2.5px #090b0e,0 24px 60px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.05)
+}
+.llid::before{/* camera */
+  content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  width:7px;height:7px;background:#1a1c30;border-radius:50%;box-shadow:0 0 0 1.5px #2c2f4a
+}
+.llid{position:relative}
+.lscr{border-radius:4px 4px 2px 2px;overflow:hidden;background:#111;margin:22px 6px 5px}
+.lbase{
+  height:14px;background:linear-gradient(180deg,#1c2030,#131520);
+  border-radius:0 0 6px 6px;
+  box-shadow:0 0 0 1px #2c2f4a,0 6px 20px rgba(0,0,0,.5);
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:0
+}
+.lnotch{
+  height:10px;background:#131520;border-radius:0 0 6px 6px;
+  box-shadow:0 0 0 1px #252840
+}
+.lfoot{height:5px;background:#131520;border-radius:0 0 6px 6px;box-shadow:0 0 0 1px #252840,0 4px 12px rgba(0,0,0,.4)}
 
-  .sidebar-tabs {
-    display: flex; border-bottom: 1px solid var(--border);
-  }
-  .sidebar-tab {
-    flex: 1; padding: 10px 8px; border: none; background: none;
-    font-family: var(--mono); font-size: 10px; font-weight: 600;
-    letter-spacing: .5px; color: var(--text3); cursor: pointer;
-    text-transform: uppercase; transition: all .15s;
-    border-bottom: 2px solid transparent;
-  }
-  .sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+/* MONITOR */
+.mw{display:flex;flex-direction:column;align-items:center}
+.mlid{
+  background:linear-gradient(160deg,#1e2035,#141620);
+  border-radius:10px;display:inline-block;position:relative;
+  box-shadow:0 0 0 1.5px #2c2f4a,0 0 0 2.5px #090b0e,0 24px 60px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.05)
+}
+.mlid::before{/* camera */
+  content:'';position:absolute;top:7px;left:50%;transform:translateX(-50%);
+  width:6px;height:6px;background:#1a1c30;border-radius:50%;box-shadow:0 0 0 1.5px #2c2f4a
+}
+.mscr{border-radius:3px;overflow:hidden;background:#111;margin:20px 6px 5px}
+.mneck{background:#1c2030;box-shadow:0 0 0 1px #252840}
+.mbase{background:linear-gradient(180deg,#1c2030,#131520);border-radius:4px;box-shadow:0 0 0 1px #252840,0 6px 20px rgba(0,0,0,.4)}
 
-  .sidebar-body {
-    flex: 1; overflow-y: auto; padding: 12px;
-    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-  }
-  .sidebar-body::-webkit-scrollbar { width: 4px; }
-  .sidebar-body::-webkit-scrollbar-track { background: transparent; }
-  .sidebar-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+/* PLACEHOLDER */
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#0a0d12;color:var(--tx3);text-align:center;padding:24px}
+.ph-ic{opacity:.25}
+.ph-tl{font-size:12px;font-weight:600;color:var(--tx2)}
+.ph-sb{font-size:10px;line-height:1.6}
+.ph-nt{font-size:9px;padding:6px 10px;border-radius:4px;margin-top:4px;background:rgba(255,170,0,.07);border:1px solid rgba(255,170,0,.14);color:var(--wn);line-height:1.5}
 
-  .device-group { margin-bottom: 16px; }
-  .device-group-title {
-    font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
-    color: var(--text3); text-transform: uppercase;
-    margin-bottom: 6px; padding: 0 2px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .device-group-title::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
+/* STATUS BAR */
+.sbar{
+  position:fixed;bottom:0;right:0;
+  left:272px;height:28px;
+  background:var(--sf);border-top:1px solid var(--bd);
+  display:flex;align-items:center;gap:12px;padding:0 14px;
+  font-size:10px;color:var(--tx3);z-index:30
+}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0;transition:all .3s}
+.sdot.live{background:var(--ac3);box-shadow:0 0 6px var(--ac3)}
+.sdot.loading{background:var(--ac);animation:pls .8s ease-in-out infinite}
+@keyframes pls{0%,100%{opacity:1}50%{opacity:.25}}
 
-  .device-list { display: flex; flex-direction: column; gap: 2px; }
+.zg{margin-left:auto;display:flex;align-items:center;gap:4px}
+.zb{
+  width:22px;height:22px;border-radius:4px;background:var(--sf2);
+  border:1px solid var(--bd);color:var(--tx2);font-size:14px;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s
+}
+.zb:hover{border-color:var(--ac);color:var(--ac)}
+.zv{font-size:10px;min-width:36px;text-align:center;color:var(--tx2)}
 
-  .device-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 7px 10px; border-radius: 6px; border: 1px solid transparent;
-    cursor: pointer; transition: all .15s;
-  }
-  .device-item:hover { background: var(--surface2); border-color: var(--border); }
-  .device-item.active {
-    background: rgba(0,229,255,.06);
-    border-color: rgba(0,229,255,.25);
-  }
+/* PANELS */
+.tpnl{display:none}.tpnl.active{display:block}
 
-  .device-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
-
-  .device-info { flex: 1; min-width: 0; }
-  .device-name {
-    font-size: 11px; font-weight: 500; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .device-item.active .device-name { color: var(--accent); }
-  .device-dims { font-size: 9px; color: var(--text3); margin-top: 1px; }
-
-  .device-badge {
-    font-size: 8px; padding: 1px 5px; border-radius: 3px;
-    font-weight: 600; letter-spacing: .5px; flex-shrink: 0;
-  }
-  .badge-new { background: rgba(0,230,118,.12); color: var(--accent3); }
-  .badge-old { background: rgba(255,165,2,.1); color: var(--warn); }
-
-  /* ─── CUSTOM SIZE ─── */
-  .custom-panel {
-    padding: 10px; background: var(--surface2); border-radius: 6px;
-    border: 1px solid var(--border); margin-bottom: 12px;
-  }
-  .custom-panel-title {
-    font-size: 9px; font-weight: 700; letter-spacing: 1px;
-    color: var(--text3); text-transform: uppercase; margin-bottom: 8px;
-  }
-  .custom-row { display: flex; gap: 6px; align-items: center; }
-  .custom-input {
-    flex: 1; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 4px; padding: 5px 8px; font-family: var(--mono);
-    font-size: 11px; color: var(--text); outline: none; width: 100%;
-    transition: border-color .15s;
-  }
-  .custom-input:focus { border-color: var(--accent); }
-  .custom-sep { color: var(--text3); font-size: 12px; }
-
-  /* ─── CANVAS ─── */
-  .canvas {
-    background: var(--bg);
-    overflow: auto;
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 32px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-
-  .canvas-inner {
-    position: relative;
-    transition: transform .3s cubic-bezier(.25,.46,.45,.94);
-  }
-
-  /* ─── DEVICE FRAME ─── */
-  .device-frame-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .device-meta {
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-  }
-  .device-meta-name {
-    font-family: var(--sans); font-weight: 700; font-size: 16px; color: var(--text);
-    letter-spacing: -.3px;
-  }
-  .device-meta-dim {
-    font-size: 11px; color: var(--text2);
-  }
-
-  .frame-phone {
-    position: relative;
-    background: #1a1a2e;
-    border-radius: 40px;
-    padding: 16px 8px;
-    box-shadow:
-      0 0 0 1px #2a2a4a,
-      0 0 0 3px #111130,
-      0 25px 60px rgba(0,0,0,.7),
-      inset 0 1px 0 rgba(255,255,255,.05);
-  }
-  .frame-phone::before {
-    content: '';
-    position: absolute;
-    top: 10px; left: 50%; transform: translateX(-50%);
-    width: 60px; height: 5px;
-    background: #252545;
-    border-radius: 3px;
-  }
-
-  .frame-tablet {
-    position: relative;
-    background: #1a1a2e;
-    border-radius: 20px;
-    padding: 20px 14px;
-    box-shadow:
-      0 0 0 1px #2a2a4a,
-      0 0 0 3px #111130,
-      0 25px 60px rgba(0,0,0,.7),
-      inset 0 1px 0 rgba(255,255,255,.05);
-  }
-  .frame-tablet::before {
-    content: '';
-    position: absolute;
-    left: 8px; top: 50%; transform: translateY(-50%);
-    width: 4px; height: 40px;
-    background: #252545;
-    border-radius: 2px;
-  }
-
-  .frame-desktop {
-    position: relative;
-    background: #1a1a2e;
-    border-radius: 10px 10px 0 0;
-    padding: 24px 4px 4px;
-    box-shadow:
-      0 0 0 1px #2a2a4a,
-      0 25px 60px rgba(0,0,0,.7);
-  }
-  .frame-desktop::before {
-    content: '';
-    position: absolute;
-    top: 10px; left: 50%; transform: translateX(-50%);
-    width: 8px; height: 8px;
-    background: #333360;
-    border-radius: 50%;
-  }
-  .frame-desktop-stand {
-    width: 120px; height: 12px;
-    background: #1a1a2e;
-    margin: 0 auto;
-    clip-path: trapezoid;
-  }
-  .frame-desktop-base {
-    width: 200px; height: 6px;
-    background: #1a1a2e;
-    border-radius: 0 0 4px 4px;
-    margin: 0 auto;
-    box-shadow: 0 0 0 1px #2a2a4a;
-  }
-
-  .screen {
-    overflow: hidden;
-    background: #fff;
-    position: relative;
-  }
-  .screen iframe {
-    display: block;
-    border: none;
-    width: 100%;
-    height: 100%;
-  }
-
-  .screen-phone { border-radius: 24px; }
-  .screen-tablet { border-radius: 10px; }
-  .screen-desktop { border-radius: 4px; }
-
-  /* placeholder */
-  .screen-placeholder {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 12px; height: 100%; background: var(--surface2); color: var(--text3);
-    text-align: center; padding: 20px;
-  }
-  .screen-placeholder .ph-icon { font-size: 40px; opacity: .4; }
-  .screen-placeholder .ph-title { font-size: 13px; font-weight: 600; color: var(--text2); }
-  .screen-placeholder .ph-sub { font-size: 11px; line-height: 1.5; }
-  .screen-placeholder .ph-warn {
-    font-size: 10px; background: rgba(255,165,2,.1);
-    border: 1px solid rgba(255,165,2,.2);
-    color: var(--warn); padding: 6px 10px; border-radius: 4px; margin-top: 4px;
-  }
-
-  /* ─── STATUS BAR ─── */
-  .statusbar {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    height: 26px;
-    display: flex; align-items: center; gap: 16px;
-    padding: 0 16px;
-    font-size: 10px; color: var(--text3);
-    z-index: 20;
-  }
-  .status-chip {
-    display: flex; align-items: center; gap: 5px;
-  }
-  .status-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-  }
-  .dot-green { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
-  .dot-gray { background: var(--text3); }
-
-  /* ─── ZOOM ─── */
-  .zoom-ctrl {
-    display: flex; align-items: center; gap: 4px;
-    margin-left: auto;
-  }
-  .zoom-btn {
-    width: 20px; height: 20px; border-radius: 3px;
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text2); font-size: 12px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: all .15s;
-  }
-  .zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .zoom-val { font-size: 10px; min-width: 32px; text-align: center; color: var(--text2); }
-
-  /* ─── ORIENTATION BTN ─── */
-  .orient-btn {
-    display: flex; align-items: center; gap: 4px;
-    padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);
-    background: var(--surface2); color: var(--text2); font-family: var(--mono);
-    font-size: 10px; cursor: pointer; transition: all .15s;
-  }
-  .orient-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* ─── PANEL TABS ─── */
-  .panel-tab-content { display: none; }
-  .panel-tab-content.active { display: block; }
-
-  /* ─── SCROLLBAR CANVAS ─── */
-  .canvas::-webkit-scrollbar { width: 6px; height: 6px; }
-  .canvas::-webkit-scrollbar-track { background: transparent; }
-  .canvas::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* ─── RESPONSIVE TAG ─── */
-  .rtag {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 9px; padding: 2px 6px; border-radius: 3px;
-    font-weight: 700; letter-spacing: .5px;
-  }
-  .rtag-mobile { background: rgba(0,229,255,.1); color: var(--accent); }
-  .rtag-tablet { background: rgba(124,77,255,.1); color: var(--accent2); }
-  .rtag-desktop { background: rgba(0,230,118,.1); color: var(--accent3); }
-
-  .info-row {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
-    padding: 8px 10px; background: var(--surface2); border-radius: 6px;
-    border: 1px solid var(--border);
-  }
-
-  /* scale transform origin top */
-  .scale-wrap {
-    transform-origin: top center;
-    transition: transform .3s;
-  }
-
-  /* ─── LOADING OVERLAY ─── */
-  .loading-bar {
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: var(--accent); transform: scaleX(0); transform-origin: left;
-    transition: transform .3s; z-index: 100;
-  }
-  .loading-bar.active { animation: loadbar 1.5s ease-in-out infinite; }
-  @keyframes loadbar {
-    0% { transform: scaleX(0) translateX(0); }
-    50% { transform: scaleX(1) translateX(0); }
-    100% { transform: scaleX(1) translateX(100%); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .device-frame-wrap { animation: fadeIn .3s ease; }
+@keyframes popIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.fr{animation:popIn .22s ease}
 </style>
 </head>
 <body>
 
+<!-- ═══ INLINE SVG SYMBOLS ═══ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <!-- phone -->
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="2" width="14" height="20" rx="3"/>
+    <circle cx="12" cy="18.5" r=".8" fill="currentColor" stroke="none"/>
+  </symbol>
+  <!-- tablet -->
+  <symbol id="i-tab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="2" width="18" height="20" rx="2.5"/>
+    <circle cx="12" cy="18.5" r=".8" fill="currentColor" stroke="none"/>
+  </symbol>
+  <!-- laptop -->
+  <symbol id="i-lap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="3" width="20" height="14" rx="2"/>
+    <polyline points="2 21 22 21"/>
+    <path d="M9 21l1.5-4h3l1.5 4"/>
+  </symbol>
+  <!-- monitor -->
+  <symbol id="i-mon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="3" width="20" height="14" rx="2"/>
+    <line x1="8" y1="21" x2="16" y2="21"/>
+    <line x1="12" y1="17" x2="12" y2="21"/>
+  </symbol>
+  <!-- apple -->
+  <symbol id="i-apple" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+  </symbol>
+  <!-- android -->
+  <symbol id="i-and" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5S11 23.33 11 22.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V8H6v10zM3.5 8C2.67 8 2 8.67 2 9.5v7c0 .83.67 1.5 1.5 1.5S5 17.33 5 16.5v-7C5 8.67 4.33 8 3.5 8zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zm-4.97-5.84 1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48A6.4 6.4 0 0 0 12 1c-.96 0-1.86.23-2.66.63L7.85.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31A6.49 6.49 0 0 0 6 7.5h12a6.49 6.49 0 0 0-2.47-5.34zM10 5H9V4h1v1zm5 0h-1V4h1v1z"/>
+  </symbol>
+  <!-- google G -->
+  <symbol id="i-goog" viewBox="0 0 24 24">
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+  </symbol>
+  <!-- rotate -->
+  <symbol id="i-rot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+  </symbol>
+  <!-- link -->
+  <symbol id="i-lnk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+  </symbol>
+  <!-- x close -->
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </symbol>
+  <!-- play -->
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor">
+    <polygon points="5 3 19 12 5 21 5 3"/>
+  </symbol>
+  <!-- devframe logo icon -->
+  <symbol id="i-logo" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="3" width="20" height="14" rx="2"/>
+    <rect x="5" y="6" width="6" height="8" rx="1"/>
+    <rect x="13" y="6" width="6" height="4" rx="1"/>
+    <line x1="2" y1="20" x2="22" y2="20"/>
+  </symbol>
+</svg>
+
 <div class="app">
 
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <div class="logo">
-      <div class="logo-icon">⊞</div>
-      Dev<span>Frame</span>
-    </div>
-
-    <div class="url-bar">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-      </svg>
-      <input id="urlInput" type="url" placeholder="https://example.com — enter a URL and press Load" />
-    </div>
-
-    <div class="topbar-actions">
-      <button class="btn btn-ghost" onclick="clearURL()">✕ Clear</button>
-      <button class="btn btn-primary" onclick="loadURL()">⚡ Load</button>
-    </div>
-  </header>
-
-  <!-- DEVICE TOOLBAR (quick picks) -->
-  <div class="device-toolbar">
-    <div class="toolbar-section">
-      <span class="toolbar-label">📱 Mobile</span>
-      <button class="device-btn" onclick="quickSet('iPhone 15 Pro', 393, 852, 'phone')" title="iPhone 15 Pro">
-        <span class="d-icon">🍎</span>
-        <span class="d-name">iPhone 15</span>
-      </button>
-      <button class="device-btn" onclick="quickSet('iPhone SE', 375, 667, 'phone')" title="iPhone SE">
-        <span class="d-icon">🍎</span>
-        <span class="d-name">SE</span>
-      </button>
-      <button class="device-btn" onclick="quickSet('Galaxy S24', 412, 915, 'phone')" title="Samsung Galaxy S24">
-        <span class="d-icon">🔷</span>
-        <span class="d-name">S24</span>
-      </button>
-      <button class="device-btn" onclick="quickSet('Pixel 8', 412, 892, 'phone')" title="Google Pixel 8">
-        <span class="d-icon">🔵</span>
-        <span class="d-name">Pixel 8</span>
-      </button>
-    </div>
-    <div class="toolbar-section">
-      <span class="toolbar-label">📟 Tablet</span>
-      <button class="device-btn" onclick="quickSet('iPad Pro 12.9\"', 1024, 1366, 'tablet')" title="iPad Pro">
-        <span class="d-icon">🍎</span>
-        <span class="d-name">iPad Pro</span>
-      </button>
-      <button class="device-btn" onclick="quickSet('iPad Air', 820, 1180, 'tablet')" title="iPad Air">
-        <span class="d-icon">🍎</span>
-        <span class="d-name">iPad Air</span>
-      </button>
-      <button class="device-btn" onclick="quickSet('Galaxy Tab S9', 800, 1280, 'tablet')" title="Galaxy Tab S9">
-        <span class="d-icon">🔷</span>
-        <span class="d-name">Tab S9</span>
-      </button>
-    </div>
-    <div class="toolbar-section">
-      <span class="toolbar-label">🖥 Desktop</span>
-      <button class="device-btn" onclick="quickSet('Laptop', 1280, 800, 'desktop')" title="Laptop">
-        <span class="d-icon">💻</span>
-        <span class="d-name">1280</span>
-      </button>
-      <button class="device-btn" onclick="quickSet('Full HD', 1920, 1080, 'desktop')" title="Full HD">
-        <span class="d-icon">🖥</span>
-        <span class="d-name">1080p</span>
-      </button>
-      <button class="device-btn" onclick="quickSet('4K UHD', 2560, 1440, 'desktop')" title="4K">
-        <span class="d-icon">🖥</span>
-        <span class="d-name">4K</span>
-      </button>
-    </div>
-    <div class="toolbar-section">
-      <button class="orient-btn" onclick="toggleOrientation()" id="orientBtn" title="Rotate">
-        ↻ Rotate
-      </button>
-    </div>
+<!-- ═══ TOPBAR ═══ -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-m"><svg width="17" height="17"><use href="#i-logo"/></svg></div>
+    Dev<em>Frame</em>
   </div>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-tabs">
-      <button class="sidebar-tab active" onclick="switchTab('devices', this)">Devices</button>
-      <button class="sidebar-tab" onclick="switchTab('custom', this)">Custom</button>
-      <button class="sidebar-tab" onclick="switchTab('info', this)">Info</button>
+  <div class="urlbar">
+    <svg width="13" height="13" style="flex-shrink:0;color:var(--tx3)"><use href="#i-lnk"/></svg>
+    <input id="urlInput" type="url" placeholder="https://example.com — enter URL and press Load" autocomplete="off" spellcheck="false"/>
+  </div>
+
+  <button class="btn btn-g" onclick="clearURL()">
+    <svg width="11" height="11"><use href="#i-x"/></svg>Clear
+  </button>
+  <button class="btn btn-p" onclick="loadURL()">
+    <svg width="11" height="11"><use href="#i-play"/></svg>Load
+  </button>
+</header>
+
+<!-- ═══ TOOLBAR ═══ -->
+<div class="toolbar">
+  <span class="tlbl">Mobile</span>
+
+  <button class="tbtn" data-q="iPhone 16 Pro|phone|393|852" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-apple"/></svg>
+    <span class="tn">iPhone 16</span>
+  </button>
+  <button class="tbtn" data-q="iPhone SE|phone|375|667" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-apple"/></svg>
+    <span class="tn">SE</span>
+  </button>
+  <button class="tbtn" data-q="Galaxy S24|phone|393|851" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-and"/></svg>
+    <span class="tn">S24</span>
+  </button>
+  <button class="tbtn" data-q="Pixel 8|phone|412|892" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-goog"/></svg>
+    <span class="tn">Pixel 8</span>
+  </button>
+
+  <div class="tsep"></div><span class="tlbl">Tablet</span>
+
+  <button class="tbtn" data-q='iPad Pro 12.9|tablet|1024|1366' onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-apple"/></svg>
+    <span class="tn">iPad Pro</span>
+  </button>
+  <button class="tbtn" data-q="iPad Air|tablet|820|1180" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-apple"/></svg>
+    <span class="tn">iPad Air</span>
+  </button>
+  <button class="tbtn" data-q="Tab S9|tablet|800|1280" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-and"/></svg>
+    <span class="tn">Tab S9</span>
+  </button>
+
+  <div class="tsep"></div><span class="tlbl">Desktop</span>
+
+  <button class="tbtn" data-q="MacBook Air|laptop|1280|800" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-lap"/></svg>
+    <span class="tn">MacBook</span>
+  </button>
+  <button class="tbtn" data-q="MacBook Pro 14|laptop|1512|982" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-lap"/></svg>
+    <span class="tn">MBP 14</span>
+  </button>
+  <button class="tbtn" data-q="Full HD|laptop|1920|1080" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-lap"/></svg>
+    <span class="tn">1080p</span>
+  </button>
+  <button class="tbtn" data-q="4K Monitor|monitor|2560|1440" onclick="qset(this)">
+    <svg class="ti" width="15" height="15"><use href="#i-mon"/></svg>
+    <span class="tn">4K</span>
+  </button>
+
+  <div class="tsep"></div>
+  <button class="rot-btn" onclick="toggleOri()">
+    <svg width="12" height="12"><use href="#i-rot"/></svg>Rotate
+  </button>
+</div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="stabs">
+    <button class="stab active" onclick="switchTab('devices',this)">Devices</button>
+    <button class="stab" onclick="switchTab('custom',this)">Custom</button>
+    <button class="stab" onclick="switchTab('info',this)">Info</button>
+  </div>
+  <div class="sbody">
+
+    <div class="tpnl active" id="tab-devices">
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-apple"/></svg>iPhone</div><div id="dl-iphone"></div></div>
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-and"/></svg>Samsung Galaxy</div><div id="dl-samsung"></div></div>
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-goog"/></svg>Google Pixel</div><div id="dl-pixel"></div></div>
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-and"/></svg>Other Android</div><div id="dl-other"></div></div>
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-tab"/></svg>iPad</div><div id="dl-ipad"></div></div>
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-tab"/></svg>Samsung Tab</div><div id="dl-stab"></div></div>
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-lap"/></svg>MacBook / Laptop</div><div id="dl-laptop"></div></div>
+      <div class="dg"><div class="dgt"><svg width="11" height="11"><use href="#i-mon"/></svg>Desktop Monitor</div><div id="dl-monitor"></div></div>
     </div>
 
-    <div class="sidebar-body">
-
-      <!-- DEVICES TAB -->
-      <div class="panel-tab-content active" id="tab-devices">
-
-        <!-- iPhone -->
-        <div class="device-group">
-          <div class="device-group-title">🍎 iPhone</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this, 'iPhone 16 Pro Max', 440, 956, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 16 Pro Max</div>
-                <div class="device-dims">440 × 956px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 16 Pro', 402, 874, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 16 Pro</div>
-                <div class="device-dims">402 × 874px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 15 Pro Max', 430, 932, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 15 Pro Max</div>
-                <div class="device-dims">430 × 932px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 15 / 14', 390, 844, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 15 / 14</div>
-                <div class="device-dims">390 × 844px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 13 Mini', 375, 812, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 13 Mini</div>
-                <div class="device-dims">375 × 812px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 12 / 11', 390, 844, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 12 / 11</div>
-                <div class="device-dims">390 × 844px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone X / XS', 375, 812, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone X / XS</div>
-                <div class="device-dims">375 × 812px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone SE (2022)', 375, 667, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone SE 2022</div>
-                <div class="device-dims">375 × 667px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 8 Plus', 414, 736, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 8 Plus</div>
-                <div class="device-dims">414 × 736px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 8', 375, 667, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 8</div>
-                <div class="device-dims">375 × 667px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 6/7', 375, 667, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 6 / 7</div>
-                <div class="device-dims">375 × 667px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPhone 5 / SE (1st)', 320, 568, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">iPhone 5 / SE 1st</div>
-                <div class="device-dims">320 × 568px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-          </div>
+    <div class="tpnl" id="tab-custom">
+      <div class="cpnl">
+        <div class="cptl">Custom Dimensions</div>
+        <div class="crow">
+          <input class="cin" id="cW" type="number" placeholder="Width (px)" min="240" max="5120" value="390">
+          <span style="color:var(--tx3);font-size:11px">×</span>
+          <input class="cin" id="cH" type="number" placeholder="Height (px)" min="240" max="4096" value="844">
         </div>
-
-        <!-- Samsung -->
-        <div class="device-group">
-          <div class="device-group-title">🔷 Samsung Galaxy</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this, 'Galaxy S24 Ultra', 412, 932, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy S24 Ultra</div>
-                <div class="device-dims">412 × 932px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy S24 / S23', 393, 851, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy S24 / S23</div>
-                <div class="device-dims">393 × 851px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy S22', 360, 780, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy S22</div>
-                <div class="device-dims">360 × 780px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy S21', 360, 800, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy S21</div>
-                <div class="device-dims">360 × 800px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy S20', 412, 915, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy S20</div>
-                <div class="device-dims">412 × 915px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy A54', 390, 844, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy A54</div>
-                <div class="device-dims">390 × 844px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy S8', 360, 740, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy S8</div>
-                <div class="device-dims">360 × 740px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy Note 20', 412, 915, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy Note 20</div>
-                <div class="device-dims">412 × 915px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy Z Fold 5', 904, 1024, 'tablet')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy Z Fold 5</div>
-                <div class="device-dims">904 × 1024px (unfolded)</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Google Pixel -->
-        <div class="device-group">
-          <div class="device-group-title">🔵 Google Pixel</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this, 'Pixel 9 Pro XL', 432, 960, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Pixel 9 Pro XL</div>
-                <div class="device-dims">432 × 960px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Pixel 8 Pro', 412, 892, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Pixel 8 Pro</div>
-                <div class="device-dims">412 × 892px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Pixel 7', 412, 892, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Pixel 7</div>
-                <div class="device-dims">412 × 892px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Pixel 5', 393, 851, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Pixel 5</div>
-                <div class="device-dims">393 × 851px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Other Android -->
-        <div class="device-group">
-          <div class="device-group-title">🤖 Android Other</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this, 'OnePlus 12', 412, 919, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">OnePlus 12</div>
-                <div class="device-dims">412 × 919px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Xiaomi 14 Pro', 393, 851, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Xiaomi 14 Pro</div>
-                <div class="device-dims">393 × 851px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Moto G Power', 412, 892, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Moto G Power</div>
-                <div class="device-dims">412 × 892px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Nokia 3310', 240, 320, 'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info">
-                <div class="device-name">Nokia 3310</div>
-                <div class="device-dims">240 × 320px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- iPad -->
-        <div class="device-group">
-          <div class="device-group-title">🍎 iPad</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this, 'iPad Pro 13\"', 1032, 1376, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">iPad Pro 13"</div>
-                <div class="device-dims">1032 × 1376px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPad Pro 12.9\"', 1024, 1366, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">iPad Pro 12.9"</div>
-                <div class="device-dims">1024 × 1366px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPad Pro 11\"', 834, 1194, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">iPad Pro 11"</div>
-                <div class="device-dims">834 × 1194px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPad Air (M2)', 820, 1180, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">iPad Air M2</div>
-                <div class="device-dims">820 × 1180px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPad 10th Gen', 810, 1080, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">iPad 10th Gen</div>
-                <div class="device-dims">810 × 1080px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPad Mini 6', 744, 1133, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">iPad Mini 6</div>
-                <div class="device-dims">744 × 1133px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'iPad Mini (2021)', 768, 1024, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">iPad Mini 2021</div>
-                <div class="device-dims">768 × 1024px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Samsung Tabs -->
-        <div class="device-group">
-          <div class="device-group-title">🔷 Samsung Tab</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this, 'Galaxy Tab S9 Ultra', 1848, 2960, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">Tab S9 Ultra</div>
-                <div class="device-dims">1848 × 2960px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy Tab S9', 800, 1280, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy Tab S9</div>
-                <div class="device-dims">800 × 1280px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy Tab A9', 800, 1340, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy Tab A9</div>
-                <div class="device-dims">800 × 1340px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Galaxy Tab S7', 800, 1280, 'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info">
-                <div class="device-name">Galaxy Tab S7</div>
-                <div class="device-dims">800 × 1280px</div>
-              </div>
-              <span class="device-badge badge-old">OLD</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Desktop -->
-        <div class="device-group">
-          <div class="device-group-title">🖥 Desktop / Laptop</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this, 'MacBook Air 13\"', 1280, 800, 'desktop')">
-              <div class="device-icon">💻</div>
-              <div class="device-info">
-                <div class="device-name">MacBook Air 13"</div>
-                <div class="device-dims">1280 × 800px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'MacBook Pro 14\"', 1512, 982, 'desktop')">
-              <div class="device-icon">💻</div>
-              <div class="device-info">
-                <div class="device-name">MacBook Pro 14"</div>
-                <div class="device-dims">1512 × 982px</div>
-              </div>
-              <span class="device-badge badge-new">NEW</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'MacBook Pro 16\"', 1728, 1117, 'desktop')">
-              <div class="device-icon">💻</div>
-              <div class="device-info">
-                <div class="device-name">MacBook Pro 16"</div>
-                <div class="device-dims">1728 × 1117px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Surface Pro 9', 1368, 912, 'desktop')">
-              <div class="device-icon">💻</div>
-              <div class="device-info">
-                <div class="device-name">Surface Pro 9</div>
-                <div class="device-dims">1368 × 912px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Laptop HD', 1366, 768, 'desktop')">
-              <div class="device-icon">💻</div>
-              <div class="device-info">
-                <div class="device-name">Laptop HD</div>
-                <div class="device-dims">1366 × 768px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Full HD 1080p', 1920, 1080, 'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info">
-                <div class="device-name">Full HD 1080p</div>
-                <div class="device-dims">1920 × 1080px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, '2K QHD', 2560, 1440, 'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info">
-                <div class="device-name">2K QHD</div>
-                <div class="device-dims">2560 × 1440px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, '4K UHD', 3840, 2160, 'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info">
-                <div class="device-name">4K UHD</div>
-                <div class="device-dims">3840 × 2160px</div>
-              </div>
-            </div>
-            <div class="device-item" onclick="setDevice(this, 'Ultra-wide 21:9', 2560, 1080, 'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info">
-                <div class="device-name">Ultrawide 21:9</div>
-                <div class="device-dims">2560 × 1080px</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /tab-devices -->
-
-      <!-- CUSTOM TAB -->
-      <div class="panel-tab-content" id="tab-custom">
-        <div class="custom-panel">
-          <div class="custom-panel-title">Custom Dimensions</div>
-          <div class="custom-row" style="margin-bottom:8px">
-            <input class="custom-input" id="customW" type="number" placeholder="Width (px)" min="240" max="5120" value="375">
-            <span class="custom-sep">×</span>
-            <input class="custom-input" id="customH" type="number" placeholder="Height (px)" min="240" max="4096" value="667">
-          </div>
-          <div style="margin-bottom:8px">
-            <input class="custom-input" id="customName" type="text" placeholder="Device name (optional)">
-          </div>
-          <button class="btn btn-primary" style="width:100%" onclick="applyCustom()">⚡ Apply</button>
-        </div>
-
-        <div class="device-group">
-          <div class="device-group-title">Bootstrap Breakpoints</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this,'XS — &lt;576px',375,667,'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info"><div class="device-name">XS — &lt;576px</div><div class="device-dims">375 × 667</div></div>
-              <span class="rtag rtag-mobile">xs</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'SM — 576px',576,900,'phone')">
-              <div class="device-icon">📱</div>
-              <div class="device-info"><div class="device-name">SM — 576px</div><div class="device-dims">576 × 900</div></div>
-              <span class="rtag rtag-mobile">sm</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'MD — 768px',768,1024,'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info"><div class="device-name">MD — 768px</div><div class="device-dims">768 × 1024</div></div>
-              <span class="rtag rtag-tablet">md</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'LG — 992px',992,768,'desktop')">
-              <div class="device-icon">💻</div>
-              <div class="device-info"><div class="device-name">LG — 992px</div><div class="device-dims">992 × 768</div></div>
-              <span class="rtag rtag-desktop">lg</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'XL — 1200px',1200,800,'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info"><div class="device-name">XL — 1200px</div><div class="device-dims">1200 × 800</div></div>
-              <span class="rtag rtag-desktop">xl</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'XXL — 1400px',1400,900,'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info"><div class="device-name">XXL — 1400px</div><div class="device-dims">1400 × 900</div></div>
-              <span class="rtag rtag-desktop">xxl</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="device-group">
-          <div class="device-group-title">Tailwind Breakpoints</div>
-          <div class="device-list">
-            <div class="device-item" onclick="setDevice(this,'sm — 640px',640,960,'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info"><div class="device-name">sm — 640px</div><div class="device-dims">640 × 960</div></div>
-              <span class="rtag rtag-tablet">sm</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'md — 768px',768,1024,'tablet')">
-              <div class="device-icon">📟</div>
-              <div class="device-info"><div class="device-name">md — 768px</div><div class="device-dims">768 × 1024</div></div>
-              <span class="rtag rtag-tablet">md</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'lg — 1024px',1024,768,'desktop')">
-              <div class="device-icon">💻</div>
-              <div class="device-info"><div class="device-name">lg — 1024px</div><div class="device-dims">1024 × 768</div></div>
-              <span class="rtag rtag-desktop">lg</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'xl — 1280px',1280,800,'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info"><div class="device-name">xl — 1280px</div><div class="device-dims">1280 × 800</div></div>
-              <span class="rtag rtag-desktop">xl</span>
-            </div>
-            <div class="device-item" onclick="setDevice(this,'2xl — 1536px',1536,960,'desktop')">
-              <div class="device-icon">🖥</div>
-              <div class="device-info"><div class="device-name">2xl — 1536px</div><div class="device-dims">1536 × 960</div></div>
-              <span class="rtag rtag-desktop">2xl</span>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /tab-custom -->
-
-      <!-- INFO TAB -->
-      <div class="panel-tab-content" id="tab-info">
-        <div style="padding:4px 0">
-          <div class="info-row">
-            <div>
-              <div style="font-size:11px;color:var(--text2);margin-bottom:3px">How to Use</div>
-              <div style="font-size:10px;color:var(--text3);line-height:1.6">
-                1. Enter a URL in the top bar<br>
-                2. Click ⚡ Load to preview<br>
-                3. Select any device from the sidebar or toolbar<br>
-                4. Use ↻ Rotate to toggle portrait / landscape
-              </div>
-            </div>
-          </div>
-          <div class="info-row">
-            <div>
-              <div style="font-size:11px;color:var(--warn);margin-bottom:3px">⚠ Note on X-Frame-Options</div>
-              <div style="font-size:10px;color:var(--text3);line-height:1.6">
-                Some websites (Google, Twitter, etc.) block embedding in iframes using X-Frame-Options or CSP headers. For those sites, consider using a local dev server (localhost) or sites that allow embedding.
-              </div>
-            </div>
-          </div>
-          <div class="info-row">
-            <div>
-              <div style="font-size:11px;color:var(--accent3);margin-bottom:3px">✓ Works Great With</div>
-              <div style="font-size:10px;color:var(--text3);line-height:1.6">
-                localhost:3000, localhost:8080, codepen.io embeds, github.io sites, vercel/netlify previews, and most public websites that don't restrict embedding.
-              </div>
-            </div>
-          </div>
-          <div class="info-row" id="currentInfo">
-            <div>
-              <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Current Device</div>
-              <div id="infoDevName" style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:2px">iPhone 15 / 14</div>
-              <div id="infoDevDims" style="font-size:10px;color:var(--text3)">390 × 844 px</div>
-              <div id="infoDevType" style="font-size:9px;color:var(--text3);margin-top:4px">TYPE: MOBILE</div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /tab-info -->
-
-    </div><!-- /sidebar-body -->
-  </aside>
-
-  <!-- CANVAS -->
-  <main class="canvas" id="canvas">
-    <div class="canvas-inner" id="canvasInner">
-      <div class="scale-wrap" id="scaleWrap">
-        <div class="device-frame-wrap" id="deviceFrameWrap">
-          <!-- Frame rendered by JS -->
-        </div>
+        <div class="crow"><input class="cin" id="cN" type="text" placeholder="Device name (optional)" style="width:100%"></div>
+        <button class="btn btn-p" style="width:100%;justify-content:center" onclick="applyCustom()">Apply Custom</button>
       </div>
+      <div class="dg"><div class="dgt">Bootstrap Breakpoints</div><div id="dl-bs"></div></div>
+      <div class="dg"><div class="dgt">Tailwind Breakpoints</div><div id="dl-tw"></div></div>
     </div>
 
-    <!-- STATUS BAR -->
-    <div class="statusbar">
-      <div class="status-chip">
-        <div class="status-dot dot-gray" id="statusDot"></div>
-        <span id="statusText">No URL loaded</span>
+    <div class="tpnl" id="tab-info">
+      <div class="icd">
+        <div class="icd-t">Current Device</div>
+        <p id="i-name" style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:3px">—</p>
+        <p id="i-dims" style="color:var(--tx2)">—</p>
+        <p id="i-type" style="font-size:9px;color:var(--tx3);margin-top:4px">—</p>
       </div>
-      <div class="status-chip">
-        <span id="statusDims" style="font-family:var(--mono)">390 × 844</span>
+      <div class="icd">
+        <div class="icd-t">How to Use</div>
+        <p>1. Enter a URL and press Load<br>2. Pick a device from the sidebar<br>3. Use Rotate to toggle portrait / landscape<br>4. Use +/− or FIT to adjust zoom</p>
       </div>
-      <div class="status-chip" id="statusType">
-        <span class="rtag rtag-mobile">MOBILE</span>
+      <div class="icd wn">
+        <div class="icd-t">⚠ X-Frame-Options</div>
+        <p>Sites like Google & Twitter block iframe embedding via X-Frame-Options headers. Works best with localhost, Vercel, Netlify, GitHub Pages, and most custom domains.</p>
       </div>
-      <div class="zoom-ctrl">
-        <button class="zoom-btn" onclick="changeZoom(-10)">−</button>
-        <span class="zoom-val" id="zoomVal">100%</span>
-        <button class="zoom-btn" onclick="changeZoom(10)">+</button>
-        <button class="zoom-btn" onclick="resetZoom()" title="Reset zoom" style="font-size:9px;min-width:28px">FIT</button>
+      <div class="icd ok">
+        <div class="icd-t">✓ Works Great With</div>
+        <p>localhost:3000 · vercel.app · netlify.app · github.io · codepen.io · your own domain without X-Frame-Options</p>
       </div>
     </div>
-  </main>
+  </div>
+</aside>
 
-</div><!-- /app -->
+<!-- ═══ CANVAS ═══ -->
+<main class="canvas" id="canvas">
+  <div class="sh" id="sh">
+    <div class="fr" id="fr"></div>
+  </div>
+</main>
+
+<!-- ═══ STATUS BAR ═══ -->
+<div class="sbar">
+  <div class="sdot" id="sdot"></div>
+  <span id="stxt" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx3)">No URL loaded</span>
+  <span id="sdim" style="font-family:var(--mono);color:var(--tx3)">390 × 844</span>
+  <span id="styp"></span>
+  <div class="zg">
+    <button class="zb" onclick="adjZ(-10)">−</button>
+    <span class="zv" id="zv">80%</span>
+    <button class="zb" onclick="adjZ(10)">+</button>
+    <button class="zb" style="font-size:9px;min-width:28px;letter-spacing:0" onclick="doAutoZoom()">FIT</button>
+  </div>
+</div>
 
 <script>
-  // ─── STATE ───
-  let state = {
-    name: 'iPhone 15 / 14',
-    width: 390,
-    height: 844,
-    type: 'phone',  // phone | tablet | desktop
-    isLandscape: false,
-    url: '',
-    zoom: 100
-  };
+// ────────────────────────────
+// DATABASE
+// ────────────────────────────
+const DB = {
+  iphone:[
+    {n:'iPhone 16 Pro Max',w:440,h:956,b:'new'},
+    {n:'iPhone 16 Pro',    w:402,h:874,b:'new'},
+    {n:'iPhone 15 Pro Max',w:430,h:932},
+    {n:'iPhone 15 / 14',   w:390,h:844},
+    {n:'iPhone 13 Mini',   w:375,h:812},
+    {n:'iPhone 12 / 11',   w:390,h:844},
+    {n:'iPhone X / XS',    w:375,h:812},
+    {n:'iPhone SE 2022',   w:375,h:667},
+    {n:'iPhone 8 Plus',    w:414,h:736,b:'old'},
+    {n:'iPhone 8',         w:375,h:667,b:'old'},
+    {n:'iPhone 6 / 7',     w:375,h:667,b:'old'},
+    {n:'iPhone 5 / SE 1st',w:320,h:568,b:'old'},
+  ],
+  samsung:[
+    {n:'Galaxy S24 Ultra', w:412,h:932,b:'new'},
+    {n:'Galaxy S24 / S23', w:393,h:851},
+    {n:'Galaxy S22',       w:360,h:780},
+    {n:'Galaxy S21',       w:360,h:800},
+    {n:'Galaxy S20',       w:412,h:915},
+    {n:'Galaxy A54',       w:390,h:844},
+    {n:'Galaxy S8',        w:360,h:740,b:'old'},
+    {n:'Galaxy Note 20',   w:412,h:915,b:'old'},
+    {n:'Galaxy Z Fold 5',  w:904,h:1024,b:'new'},
+  ],
+  pixel:[
+    {n:'Pixel 9 Pro XL',   w:432,h:960,b:'new'},
+    {n:'Pixel 8 Pro',      w:412,h:892},
+    {n:'Pixel 7',          w:412,h:892},
+    {n:'Pixel 5',          w:393,h:851,b:'old'},
+  ],
+  other:[
+    {n:'OnePlus 12',       w:412,h:919,b:'new'},
+    {n:'Xiaomi 14 Pro',    w:393,h:851,b:'new'},
+    {n:'Moto G Power',     w:412,h:892},
+    {n:'Nokia 3310',       w:240,h:320,b:'old'},
+  ],
+  ipad:[
+    {n:'iPad Pro 13"',     w:1032,h:1376,b:'new'},
+    {n:'iPad Pro 12.9"',   w:1024,h:1366},
+    {n:'iPad Pro 11"',     w:834, h:1194},
+    {n:'iPad Air M2',      w:820, h:1180,b:'new'},
+    {n:'iPad 10th Gen',    w:810, h:1080},
+    {n:'iPad Mini 6',      w:744, h:1133},
+    {n:'iPad Mini 2021',   w:768, h:1024,b:'old'},
+  ],
+  stab:[
+    {n:'Tab S9 Ultra',     w:1848,h:2960,b:'new'},
+    {n:'Galaxy Tab S9',    w:800, h:1280},
+    {n:'Galaxy Tab A9',    w:800, h:1340},
+    {n:'Galaxy Tab S7',    w:800, h:1280,b:'old'},
+  ],
+  laptop:[
+    {n:'MacBook Air 13"',  w:1280,h:800},
+    {n:'MacBook Pro 14"',  w:1512,h:982,b:'new'},
+    {n:'MacBook Pro 16"',  w:1728,h:1117},
+    {n:'Surface Pro 9',    w:1368,h:912},
+    {n:'Laptop HD',        w:1366,h:768},
+    {n:'Full HD 1080p',    w:1920,h:1080},
+  ],
+  monitor:[
+    {n:'2K QHD',           w:2560,h:1440},
+    {n:'4K UHD',           w:3840,h:2160},
+    {n:'Ultrawide 21:9',   w:2560,h:1080},
+    {n:'Full HD Monitor',  w:1920,h:1080},
+  ],
+};
+const TYPE={iphone:'phone',samsung:'phone',pixel:'phone',other:'phone',ipad:'tablet',stab:'tablet',laptop:'laptop',monitor:'monitor'};
+const ICN={iphone:'i-apple',samsung:'i-and',pixel:'i-goog',other:'i-and',ipad:'i-apple',stab:'i-and',laptop:'i-lap',monitor:'i-mon'};
+const BSPOINTS=[
+  {n:'XS <576px',  w:375,h:667,t:'phone'},
+  {n:'SM 576px',   w:576,h:900,t:'phone'},
+  {n:'MD 768px',   w:768,h:1024,t:'tablet'},
+  {n:'LG 992px',   w:992,h:768,t:'laptop'},
+  {n:'XL 1200px',  w:1200,h:800,t:'laptop'},
+  {n:'XXL 1400px', w:1400,h:900,t:'laptop'},
+];
+const TWPOINTS=[
+  {n:'sm — 640px',  w:640,h:960,t:'tablet'},
+  {n:'md — 768px',  w:768,h:1024,t:'tablet'},
+  {n:'lg — 1024px', w:1024,h:768,t:'laptop'},
+  {n:'xl — 1280px', w:1280,h:800,t:'laptop'},
+  {n:'2xl — 1536px',w:1536,h:960,t:'laptop'},
+];
 
-  // ─── INIT ───
-  renderFrame();
+// ────────────────────────────
+// STATE
+// ────────────────────────────
+const S={name:'iPhone 15 / 14',type:'phone',w:390,h:844,land:false,url:'',zoom:80};
 
-  function getW() { return state.isLandscape ? state.height : state.width; }
-  function getH() { return state.isLandscape ? state.width : state.height; }
+// ────────────────────────────
+// BUILD SIDEBAR
+// ────────────────────────────
+function iconFor(t){return t==='phone'?'i-phone':t==='tablet'?'i-tab':t==='laptop'?'i-lap':'i-mon';}
+function tagFor(t){return t==='phone'?'<span class="rtag rtm">MOB</span>':t==='tablet'?'<span class="rtag rtt">TAB</span>':'<span class="rtag rtd">DES</span>';}
 
-  function renderFrame() {
-    const w = getW(), h = getH();
-    const wrap = document.getElementById('deviceFrameWrap');
+function makeItem(d, type, icon){
+  const badge = d.b==='new'?'<span class="bge bnew">NEW</span>':d.b==='old'?'<span class="bge bold">OLD</span>':'';
+  return `<div class="di" data-name="${d.n}" data-type="${type}" data-w="${d.w}" data-h="${d.h}"
+    onclick="pickDev(this,'${d.n}','${type}',${d.w},${d.h})">
+    <div class="dic"><svg width="14" height="14"><use href="#${icon}"/></svg></div>
+    <div style="flex:1;min-width:0">
+      <div class="din">${d.n}</div>
+      <div class="did">${d.w} × ${d.h}px</div>
+    </div>
+    ${badge}
+  </div>`;
+}
+function makeBPItem(d){
+  const ic=iconFor(d.t);
+  return `<div class="di" onclick="pickDev(this,'${d.n}','${d.t}',${d.w},${d.h})">
+    <div class="dic"><svg width="14" height="14"><use href="#${ic}"/></svg></div>
+    <div style="flex:1;min-width:0">
+      <div class="din">${d.n}</div>
+      <div class="did">${d.w} × ${d.h}px</div>
+    </div>
+    ${tagFor(d.t)}
+  </div>`;
+}
 
-    // choose frame class
-    let frameClass = 'frame-phone';
-    let screenClass = 'screen-phone';
-    let extraBefore = '';
-    let extraAfter = '';
+function buildSidebar(){
+  for(const [key,list] of Object.entries(DB)){
+    const el=document.getElementById('dl-'+key);
+    if(!el) continue;
+    el.innerHTML=list.map(d=>makeItem(d,TYPE[key],ICN[key])).join('');
+  }
+  document.getElementById('dl-bs').innerHTML=BSPOINTS.map(makeBPItem).join('');
+  document.getElementById('dl-tw').innerHTML=TWPOINTS.map(makeBPItem).join('');
+}
 
-    if (state.type === 'tablet') {
-      frameClass = 'frame-tablet';
-      screenClass = 'screen-tablet';
-    } else if (state.type === 'desktop') {
-      frameClass = 'frame-desktop';
-      screenClass = 'screen-desktop';
-      extraAfter = `
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <div style="width:${Math.min(w*0.1,120)}px;height:14px;background:#1a1a2e;clip-path:polygon(15% 0%,85% 0%,100% 100%,0% 100%)"></div>
-          <div style="width:${Math.min(w*0.18,200)}px;height:5px;background:#1a1a2e;border-radius:0 0 4px 4px;box-shadow:0 0 0 1px #2a2a4a"></div>
-        </div>`;
-    }
+// ────────────────────────────
+// SELECT DEVICE
+// ────────────────────────────
+function clearActive(){document.querySelectorAll('.di.active,.tbtn.active').forEach(x=>x.classList.remove('active'));}
 
-    const screenContent = state.url
-      ? `<iframe src="${state.url}" width="${w}" height="${h}" scrolling="yes" frameborder="0" allowfullscreen></iframe>`
-      : `<div class="screen-placeholder">
-           <div class="ph-icon">${state.type === 'phone' ? '📱' : state.type === 'tablet' ? '📟' : '🖥'}</div>
-           <div class="ph-title">${state.name}</div>
-           <div class="ph-sub">${w} × ${h} px<br>${state.type.toUpperCase()}</div>
-           <div class="ph-warn">Enter a URL above and click ⚡ Load</div>
-         </div>`;
+function pickDev(el,name,type,w,h){
+  clearActive(); el.classList.add('active');
+  Object.assign(S,{name,type,w,h,land:false});
+  autoZoom(); render();
+}
 
-    const tagClass = state.type === 'phone' ? 'rtag-mobile' : state.type === 'tablet' ? 'rtag-tablet' : 'rtag-desktop';
-    const tagLabel = state.type === 'phone' ? 'MOBILE' : state.type === 'tablet' ? 'TABLET' : 'DESKTOP';
+function qset(btn){
+  const [name,type,w,h]=btn.dataset.q.split('|');
+  clearActive(); btn.classList.add('active');
+  Object.assign(S,{name,type,w:+w,h:+h,land:false});
+  autoZoom(); render();
+}
 
-    wrap.innerHTML = `
-      <div class="device-meta">
-        <div class="device-meta-name">${state.name}</div>
-        <div class="device-meta-dim">
-          ${w} × ${h} px &nbsp;·&nbsp;
-          <span class="rtag ${tagClass}">${tagLabel}</span>
-          ${state.isLandscape ? ' &nbsp;· <span style="font-size:10px;color:var(--warn)">⟲ LANDSCAPE</span>' : ''}
-        </div>
-      </div>
-      <div class="${frameClass}">
-        <div class="screen ${screenClass}" style="width:${w}px;height:${h}px">
-          ${screenContent}
-        </div>
-      </div>
-      ${extraAfter}
-    `;
+function applyCustom(){
+  const w=+document.getElementById('cW').value||390;
+  const h=+document.getElementById('cH').value||844;
+  const name=document.getElementById('cN').value.trim()||`Custom ${w}×${h}`;
+  const type=w>=1400?'monitor':w>=900?'laptop':w>=600?'tablet':'phone';
+  clearActive();
+  Object.assign(S,{name,type,w,h,land:false});
+  autoZoom(); render();
+}
 
-    // update status bar
-    document.getElementById('statusDims').textContent = `${w} × ${h}`;
-    document.getElementById('statusType').innerHTML = `<span class="rtag ${tagClass}">${tagLabel}</span>`;
+// ────────────────────────────
+// FRAME BUILDERS
+// ────────────────────────────
+function gw(){return S.land?S.h:S.w;}
+function gh(){return S.land?S.w:S.h;}
 
-    // update info tab
-    document.getElementById('infoDevName').textContent = state.name;
-    document.getElementById('infoDevDims').textContent = `${w} × ${h} px`;
-    document.getElementById('infoDevType').textContent = `TYPE: ${tagLabel}`;
+function phHTML(w,h){
+  if(!S.url) return `<div class="ph" style="width:${w}px;height:${h}px">
+    <svg class="ph-ic" width="38" height="38"><use href="#${iconFor(S.type)}"/></svg>
+    <div class="ph-tl">${S.name}</div>
+    <div class="ph-sb">${w} × ${h} px — ${S.type.toUpperCase()}</div>
+    <div class="ph-nt">Enter a URL above and click Load</div>
+  </div>`;
+  return `<iframe src="${S.url}" style="width:${w}px;height:${h}px;display:block;border:none" allowfullscreen></iframe>`;
+}
 
-    applyZoom();
+function buildPhone(w,h){
+  return `<div class="pshell">
+    <div class="pscr" style="width:${w}px">${phHTML(w,h)}</div>
+    <div class="pbar"><div class="pbar-i"></div></div>
+  </div>`;
+}
+
+function buildTablet(w,h){
+  return `<div class="tshell">
+    <div class="tscr" style="width:${w}px">${phHTML(w,h)}</div>
+  </div>`;
+}
+
+function buildLaptop(w,h){
+  const baseW=w+12, footW=Math.round(baseW*0.5);
+  const notchW=Math.min(Math.round(w*0.13),160);
+  return `<div class="lw">
+    <div class="llid">
+      <div class="lscr" style="width:${w}px">${phHTML(w,h)}</div>
+    </div>
+    <div class="lbase" style="width:${baseW}px">
+      <div class="lnotch" style="width:${notchW}px"></div>
+    </div>
+    <div class="lfoot" style="width:${footW}px"></div>
+  </div>`;
+}
+
+function buildMonitor(w,h){
+  const neckH=34, neckW=Math.max(4,Math.round(w*0.006));
+  const baseW=Math.min(Math.round(w*0.14),220), baseH=10;
+  return `<div class="mw">
+    <div class="mlid">
+      <div class="mscr" style="width:${w}px">${phHTML(w,h)}</div>
+    </div>
+    <div class="mneck" style="width:${neckW}px;height:${neckH}px"></div>
+    <div class="mbase" style="width:${baseW}px;height:${baseH}px"></div>
+  </div>`;
+}
+
+// ────────────────────────────
+// RENDER
+// ────────────────────────────
+function render(){
+  const w=gw(), h=gh(), sc=S.zoom/100;
+  let inner;
+  if(S.type==='phone')       inner=buildPhone(w,h);
+  else if(S.type==='tablet') inner=buildTablet(w,h);
+  else if(S.type==='laptop') inner=buildLaptop(w,h);
+  else                       inner=buildMonitor(w,h);
+
+  const tc=S.type==='phone'?'rtm':S.type==='tablet'?'rtt':'rtd';
+  const tl=S.type==='phone'?'MOBILE':S.type==='tablet'?'TABLET':S.type==='laptop'?'LAPTOP':'DESKTOP';
+  const orient=S.land?`<span style="font-size:9px;color:var(--wn)">⟲ LANDSCAPE</span>`:'';
+
+  const fr=document.getElementById('fr');
+  fr.innerHTML=`
+    <div class="dmeta">
+      <div class="dmeta-n">${S.name}</div>
+      <div class="dmeta-d">${w} × ${h} px <span class="rtag ${tc}">${tl}</span>${orient}</div>
+    </div>
+    ${inner}
+  `;
+
+  // transform: scale from top-center with translateX(-50%) already from CSS
+  fr.style.transform=`translateX(-50%) scale(${sc})`;
+
+  // estimate rendered frame height/width (including shell padding + meta ~52px)
+  let fW,fH;
+  switch(S.type){
+    case 'phone':   fW=w+22;  fH=h+60+52; break;
+    case 'tablet':  fW=w+30;  fH=h+38+52; break;
+    case 'laptop':  fW=w+14;  fH=h+52+30+52; break;
+    default:        fW=w+14;  fH=h+38+50+52;
   }
 
-  function applyZoom() {
-    document.getElementById('scaleWrap').style.transform = `scale(${state.zoom/100})`;
-    document.getElementById('zoomVal').textContent = state.zoom + '%';
-  }
+  const sh=document.getElementById('sh');
+  sh.style.width =Math.round(fW*sc)+'px';
+  sh.style.height=Math.round(fH*sc)+'px';
 
-  function setDevice(el, name, w, h, type) {
-    // remove all active
-    document.querySelectorAll('.device-item.active').forEach(e => e.classList.remove('active'));
-    if (el) el.classList.add('active');
+  // status bar
+  document.getElementById('sdim').textContent=`${w} × ${h}`;
+  document.getElementById('styp').innerHTML=`<span class="rtag ${tc}">${tl}</span>`;
+  document.getElementById('zv').textContent=S.zoom+'%';
+  document.getElementById('i-name').textContent=S.name;
+  document.getElementById('i-dims').textContent=`${w} × ${h} px`;
+  document.getElementById('i-type').textContent=`TYPE: ${tl}`;
+}
 
-    state.name = name;
-    state.width = w;
-    state.height = h;
-    state.type = type;
-    state.isLandscape = false;
+// ────────────────────────────
+// ZOOM
+// ────────────────────────────
+function adjZ(d){S.zoom=Math.max(15,Math.min(200,S.zoom+d));render();}
+function autoZoom(){
+  const cv=document.getElementById('canvas');
+  const aw=cv.clientWidth-100, ah=cv.clientHeight-80;
+  const w=gw(),h=gh();
+  const fW=S.type==='phone'?w+22:S.type==='tablet'?w+30:w+20;
+  const fH=S.type==='phone'?h+112:S.type==='tablet'?h+90:S.type==='laptop'?h+134:h+142;
+  S.zoom=Math.max(15,Math.min(100,Math.floor(Math.min(aw/fW,ah/fH)*100)));
+}
+function doAutoZoom(){autoZoom();render();}
 
-    autoZoom();
-    renderFrame();
-  }
+// ────────────────────────────
+// URL
+// ────────────────────────────
+function loadURL(){
+  let u=document.getElementById('urlInput').value.trim();
+  if(!u) return;
+  if(!/^https?:\/\//i.test(u)) u='https://'+u;
+  document.getElementById('urlInput').value=u;
+  S.url=u;
+  const dot=document.getElementById('sdot'), txt=document.getElementById('stxt');
+  dot.className='sdot loading'; txt.textContent='Loading…';
+  render();
+  setTimeout(()=>{dot.className='sdot live'; txt.textContent=u.length>55?u.slice(0,55)+'…':u;},1800);
+}
+function clearURL(){
+  document.getElementById('urlInput').value='';
+  S.url='';
+  document.getElementById('sdot').className='sdot';
+  document.getElementById('stxt').textContent='No URL loaded';
+  render();
+}
 
-  function quickSet(name, w, h, type) {
-    // deselect sidebar items
-    document.querySelectorAll('.device-item.active').forEach(e => e.classList.remove('active'));
-    state.name = name;
-    state.width = w;
-    state.height = h;
-    state.type = type;
-    state.isLandscape = false;
-    autoZoom();
-    renderFrame();
-  }
+// ────────────────────────────
+// ROTATE
+// ────────────────────────────
+function toggleOri(){
+  if(S.type==='laptop'||S.type==='monitor') return;
+  S.land=!S.land; autoZoom(); render();
+}
 
-  function applyCustom() {
-    const w = parseInt(document.getElementById('customW').value) || 375;
-    const h = parseInt(document.getElementById('customH').value) || 667;
-    const name = document.getElementById('customName').value.trim() || `Custom ${w}×${h}`;
-    const type = w >= 1024 ? 'desktop' : w >= 600 ? 'tablet' : 'phone';
-    document.querySelectorAll('.device-item.active').forEach(e => e.classList.remove('active'));
-    state.name = name; state.width = w; state.height = h; state.type = type;
-    state.isLandscape = false;
-    autoZoom();
-    renderFrame();
-  }
+// ────────────────────────────
+// TABS
+// ────────────────────────────
+function switchTab(tab,btn){
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tpnl').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
 
-  function toggleOrientation() {
-    state.isLandscape = !state.isLandscape;
-    renderFrame();
-  }
-
-  function loadURL() {
-    let url = document.getElementById('urlInput').value.trim();
-    if (!url) return;
-    if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
-    document.getElementById('urlInput').value = url;
-    state.url = url;
-
-    const dot = document.getElementById('statusDot');
-    const txt = document.getElementById('statusText');
-    dot.className = 'status-dot dot-green';
-    dot.style.background = 'var(--accent)';
-    txt.textContent = '⟳ Loading…';
-
-    renderFrame();
-
-    setTimeout(() => {
-      dot.className = 'status-dot dot-green';
-      txt.textContent = url.length > 40 ? url.slice(0,40)+'…' : url;
-    }, 1500);
-  }
-
-  function clearURL() {
-    document.getElementById('urlInput').value = '';
-    state.url = '';
-    document.getElementById('statusDot').className = 'status-dot dot-gray';
-    document.getElementById('statusText').textContent = 'No URL loaded';
-    renderFrame();
-  }
-
-  function changeZoom(delta) {
-    state.zoom = Math.max(25, Math.min(200, state.zoom + delta));
-    applyZoom();
-  }
-
-  function resetZoom() { autoZoom(); applyZoom(); }
-
-  function autoZoom() {
-    const canvas = document.getElementById('canvas');
-    const w = state.isLandscape ? state.height : state.width;
-    const h = state.isLandscape ? state.width : state.height;
-    const availW = canvas.clientWidth - 100;
-    const availH = canvas.clientHeight - 100;
-    const zoomW = Math.floor((availW / w) * 100);
-    const zoomH = Math.floor((availH / h) * 100);
-    state.zoom = Math.min(zoomW, zoomH, 100);
-    if (state.zoom < 25) state.zoom = 25;
-  }
-
-  function switchTab(tab, btn) {
-    document.querySelectorAll('.sidebar-tab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + tab).classList.add('active');
-  }
-
-  // enter key on URL input
-  document.getElementById('urlInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') loadURL();
-  });
-
-  // auto-zoom on window resize
-  window.addEventListener('resize', () => { autoZoom(); applyZoom(); });
-
-  // initial auto-zoom
-  setTimeout(() => { autoZoom(); applyZoom(); }, 100);
+// ────────────────────────────
+// EVENTS & INIT
+// ────────────────────────────
+document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')loadURL();});
+window.addEventListener('resize',()=>{autoZoom();render();});
+buildSidebar();
+autoZoom();
+render();
 </script>
 </body>
 </html>
